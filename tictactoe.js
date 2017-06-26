@@ -1,10 +1,11 @@
 var board = [];
-
+var turn = 1;
 var isGameOver = false;
 var vsAI = false;
-var horizontalWinConditions = [[], [], []];
+var horizontalWinConditions = [[],[],[]];
 var verticalWinConditions = [[], [], []];
 var diagonalWinConditions = [[], []];
+var winConditions = [];
 
 var aiMoves = [];
 var playerMoves = [];
@@ -55,28 +56,25 @@ function populateWinConditions() {
 			diagonalWinConditions[1].push(i);
 		}
 	}
+	winConditions = [
+		horizontalWinConditions[0],
+		horizontalWinConditions[1],
+		horizontalWinConditions[2],
+		verticalWinConditions[0],
+		verticalWinConditions[1],
+		verticalWinConditions[2],
+		diagonalWinConditions[0],
+		diagonalWinConditions[1]
+	];
 }
 
 function checkWinConditions() { // returns the integer of the winner. P1 win -> 1, P2 win -> 2, none -> 0.
-	for (var i = 0; i < horizontalWinConditions.length; i++) {
-		if (areEqual(board[horizontalWinConditions[i][0]]['owner']
-			, board[horizontalWinConditions[i][1]]['owner']
-			, board[horizontalWinConditions[i][2]]['owner'])) {
-			return board[horizontalWinConditions[i][0]]['owner'];
-		}
-	}
-	for (var i = 0; i < verticalWinConditions.length; i++) {
-		if (areEqual(board[verticalWinConditions[i][0]]['owner']
-			, board[verticalWinConditions[i][1]]['owner']
-			, board[verticalWinConditions[i][2]]['owner'])) {
-			return board[verticalWinConditions[i][0]]['owner'];
-		}
-	}
-	for (var i = 0; i < diagonalWinConditions.length; i++) {
-		if (areEqual(board[diagonalWinConditions[i][0]]['owner']
-			, board[diagonalWinConditions[i][1]]['owner']
-			, board[diagonalWinConditions[i][2]]['owner'])) {
-			return board[diagonalWinConditions[i][0]]['owner'];
+	for (var i =0; i< winConditions.length; i++){
+		if (areEqual(board[winConditions[i][0]]['owner']
+		,board[winConditions[i][1]]['owner']
+		,board[winConditions[i][2]]['owner']
+		)){
+			return board[winConditions[i][0]]['owner'];
 		}
 	}
 	return 0;
@@ -186,41 +184,17 @@ function refreshMoves() {
 
 
 function immediateEndCheck(arr) { // returns the winning move or false
-
-	for (var i = 0; i < horizontalWinConditions.length; i++) {
-		var moves = horizontalWinConditions[i];
+    for (var i = 0; i < winConditions.length; i++) {
+		var moves = winConditions[i];
 		for (var n = 0; n < 3; n++) {
-			if (moves.length == 1 && board[moves[0]]['owner'] == 0) {
-				return moves[0] + 1; // position 0 will evaluate to false
-			}
-			if (arr.indexOf(horizontalWinConditions[i][n]) !== -1) {
-				moves.splice(n, 1);
-			}
-		}
-	}
-	for (var i = 0; i < verticalWinConditions.length; i++) {
-		var moves = verticalWinConditions[i];
-		for (var n = 0; n < 3; n++) {
-			if (moves.length == 1 && board[moves[0]]['owner'] == 0) {
+			if (moves.length == 1 && board[moves[0]]['owner'] == 0){
 				return moves[0] + 1;
 			}
-			if (arr.indexOf(verticalWinConditions[i][n]) !== -1) {
+			if (arr.indexOf(winConditions[i][n]) !== -1) {
 				moves.splice(n, 1);
 			}
 		}
 	}
-	for (var i = 0; i < diagonalWinConditions.length; i++) {
-		var moves = diagonalWinConditions[i];
-		for (var n = 0; n < 3; n++) {
-			if (moves.length == 1 && board[moves[0]]['owner'] == 0) {
-				return moves[0] + 1;
-			}
-			if (arr.indexOf(diagonalWinConditions[i][n]) !== -1) {
-				moves.splice(n, 1);
-			}
-		}
-	}
-
 	return false;
 }
 // TODO: why do i even have separate win conditions??? they are all teh same!!!
