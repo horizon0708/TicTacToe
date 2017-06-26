@@ -9,6 +9,7 @@ var winConditions = [];
 
 var aiMoves = [];
 var playerMoves = [];
+var combinedMoves = [];
 
 
 function square(x, y, owner) {
@@ -69,6 +70,7 @@ function populateWinConditions() {
 }
 
 function checkWinConditions() { // returns the integer of the winner. P1 win -> 1, P2 win -> 2, none -> 0.
+	//console.log(winConditions);
 	for (var i =0; i< winConditions.length; i++){
 		if (areEqual(board[winConditions[i][0]]['owner']
 		,board[winConditions[i][1]]['owner']
@@ -110,7 +112,16 @@ function onSquareClick(square) {
 	}
 	// change turn
 	turn == 1 ? turn = 2 : turn = 1;
-
+	
+	// if(vsAI){
+		aiMove();
+		drawBoard();
+		if (checkWinConditions() > 0) {
+			isGameOver = true;
+			$('#winner').html("Winner is: " + checkWinConditions());
+		// TODO: do winner stuff
+		}
+	//}
 	// if playing against AI, ai moves after player makes his move
 }
 
@@ -147,32 +158,52 @@ function aiMove() {
 	// 3. check for double prong possibility
 	// 4. try to make 2
 	// 5. randomise?
+	//console.log(playerMoves);
+	//console.log(aiMoves);
+	if(isGameOver){
+		return;
+	}	
 	refreshMoves();
-	if (immediateEndCheck(aiMoves)) { // 1.
-		board[immediateEndCheck(aiMoves) - 1]['owner'] = 2;
+	// if (immediateEndCheck(aiMoves)) { // 1.
+	// 	board[immediateEndCheck(aiMoves) - 1]['owner'] = 2;
+	// 	turn = 1;
+	// 	return;
+	// }
+	// if (immediateEndCheck(playerMoves)) { // 2.
+	// 	board[immediateEndCheck(playerMoves) - 1]['owner'] = 2;
+	// 	turn = 1;
+	// 	return;
+	// }
+	// if (connectTwo(aiMoves, playerMoves)) {
+	// 	board[connectTwo(aiMoves, playerMoves) - 1]['owner'] = 2;
+	// 	turn = 1;
+	// 	console.log("connectTwo");
+	// 	return;
+	// }
+	if (randomMove()) {
+		//console.log(board[randomMove() - 1]);
+		board[randomMove() - 1]['owner'] = 2;
 		turn = 1;
+		console.log("random");
+		//console.log(board);
 		return;
 	}
-	if (immediateEndCheck(playerMoves)) { // 2.
-		board[immediateEndCheck(playerMoves) - 1]['owner'] = 2;
-		turn = 1;
-		return;
-	}
-
-
+	return;
 }
 
-
-
-
-
 function refreshMoves() {
+			aiMoves = [];
+		playerMoves = [];
+		combinedMoves = [];
 	for (var i = 0; i < board.length; i++) {
 		if (board[i]['owner'] == 2) {
 			aiMoves.push(i);
 		}
 		if (board[i]['owner'] == 1) {
 			playerMoves.push(i);
+		}
+		if (board[i]['owner'] !== 0) {
+			combinedMoves.push(i);
 		}
 	}
 }
@@ -203,5 +234,66 @@ function immediateEndCheck(arr) { // returns the winning move or false
 // compare winconditions to played squares, return array of available wincodntions for each player
 // if the wincondition exists for both players, take it out
 // pick a square out of the remaining wincoditions.
+function connectTwo(arr, arrtwo){
+	if(arr.length == 0){
+		return;
+	}
+	
+	var candidateConditions = [];
+	loop1:
+	for (var i = 0; i < winConditions.length; i++) {
+		loop2:
+		for (var n = 0; n < 3; n++) {
+			if (arr.indexOf(winConditions[i][n]) !== -1) {
+				candidateConditions.push(winConditions[i]);
+				continue loop1;
+			}
+		}
+	}
+	if (candidateConditions.length == 0){
+		return false;
+	}
+	loop3:
+	for (var i = 0; i < winConditions.length; i++) {
+		loop4:
+		for (var n = 0; n < 3; n++) {
+			if (arrtwo.indexOf(winConditions[i][n]) !== -1 && candidateConditions.indexOf(winConditions[i] !== -1)){
+				candidateConditions.splice(candidateConditions.indexOf(winConditions[i]),1);
+				continue loop3;
+			}
+		}
+	}
+	if (candidateConditions.length == 0){
+		return false;
+	}
+	for (var i = 0; i < candidateConditions[0].length; i++) {
+		if (arr.indexOf(candidateConditions[0][i] !== -1)){
+			return candidateConditions[0][i] + 1;
+		}
+	}
+}
 
+function randomMove(){
+	var moves = [0,1,2,3,4,5,6,7,8];
+	var combined = playerMoves.concat(aiMoves);
+	console.log(combinedMoves);
+	moves = shuffleArray(moves);
+	console.log(moves);
+	for (var i = 0; i < moves.length; i++) {
+		if(combined.indexOf(moves[i]) == -1){
+			console.log("randommove: "+ moves[i]);
+			return moves[i] + 1;
+		}	
+	}
+	return false;
+}
 
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
