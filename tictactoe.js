@@ -1,16 +1,11 @@
 var board = [];
 var turn = 1;
 var isGameOver = false;
-var vsAI = false;
+var vsAI = true;
 var horizontalWinConditions = [[],[],[]];
 var verticalWinConditions = [[], [], []];
 var diagonalWinConditions = [[], []];
 var winConditions = [];
-
-var aiMoves = [];
-var playerMoves = [];
-var combinedMoves = [];
-
 
 function square(x, y, owner) {
 	this.x = x;
@@ -73,7 +68,6 @@ function populateWinConditions() {
 }
 
 function checkWinConditions() { // returns the integer of the winner. P1 win -> 1, P2 win -> 2, none -> 0.
-	//console.log(winConditions);
 	for (var i =0; i< winConditions.length; i++){
 		if (areEqual(board[winConditions[i][0]]['owner']
 		,board[winConditions[i][1]]['owner']
@@ -116,7 +110,7 @@ function onSquareClick(square) {
 	// change turn
 	turn == 1 ? turn = 2 : turn = 1;
 	
-	// if(vsAI){
+	if(vsAI){
 		aiMove();
 		drawBoard();
 		if (checkWinConditions() > 0) {
@@ -124,7 +118,7 @@ function onSquareClick(square) {
 			$('#winner').html("Winner is: " + checkWinConditions());
 		// TODO: do winner stuff
 		}
-	//}
+	}
 	// if playing against AI, ai moves after player makes his move
 }
 
@@ -161,14 +155,12 @@ function aiMove() {
 	// 3. check for double prong possibility
 	// 4. try to make 2
 	// 5. randomise?
-	//console.log(playerMoves);
-	//console.log(aiMoves);
 	if(isGameOver){
 		return;
 	}	
-	refreshMoves();
+
 	if (immediateEndCheck('ai')) { // 1.
-		board[immediateEndCheck()-1]['owner'] = 2;
+		board[immediateEndCheck('ai')-1]['owner'] = 2;
 		turn = 1;
 		console.log("I win!");
 		return;
@@ -179,12 +171,9 @@ function aiMove() {
 		console.log('block!');
 		return;
 	}
-	console.log(connectTwo());
 	if (connectTwo()){
-		board[connectTwo() - 1]['owner'] = 2;
-		
+		board[connectTwo() - 1]['owner'] = 2;	
 		turn = 1;
-		// console.log("connectTwo");
 		return;
 	}
 	if (typeof randomMove() == "number") {
@@ -197,29 +186,6 @@ function aiMove() {
 	}
 	return;
 }
-
-function refreshMoves() {
-		aiMoves = [];
-		playerMoves = [];
-		combinedMoves = [];
-	for (var i = 0; i < board.length; i++) {
-		if (board[i]['owner'] == 2) {
-			aiMoves.push(i);
-		}
-		if (board[i]['owner'] == 1) {
-			playerMoves.push(i);
-		}
-		if (board[i]['owner'] !== 0) {
-			combinedMoves.push(i);
-		}
-	}
-}
-
-
-//compare index numbers to the win conditions.
-// if two of the index numbers match a particular win condition...
-// deploy at the index number not yet there.
-
 
 function immediateEndCheck(str) { // returns the winning move(number) or false
     endCheck:
@@ -243,12 +209,7 @@ function immediateEndCheck(str) { // returns the winning move(number) or false
 	}
 	return false;
 }
-// TODO: why do i even have separate win conditions??? they are all teh same!!!
 
-
-// compare winconditions to played squares, return array of available wincodntions for each player
-// if the wincondition exists for both players, take it out
-// pick a square out of the remaining wincoditions.
 function connectTwo(){
 	if(aiMoves.length == 0){
 		return false;
