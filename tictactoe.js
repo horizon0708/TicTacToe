@@ -164,25 +164,25 @@ function aiMove() {
 		return;
 	}	
 	refreshMoves();
-	// if (immediateEndCheck(aiMoves)) { // 1.
-	// 	board[immediateEndCheck(aiMoves) - 1]['owner'] = 2;
+	// if (typeof immediateEndCheck(aiMoves) == 'number') { // 1.
+	// 	board[immediateEndCheck(aiMoves)]['owner'] = 2;
 	// 	turn = 1;
 	// 	return;
 	// }
-	// if (immediateEndCheck(playerMoves)) { // 2.
-	// 	board[immediateEndCheck(playerMoves) - 1]['owner'] = 2;
+	// if (typeof immediateEndCheck(playerMoves) == 'number') { // 2.
+	// 	board[immediateEndCheck(playerMoves)]['owner'] = 2;
 	// 	turn = 1;
 	// 	return;
 	// }
-	// if (connectTwo(aiMoves, playerMoves)) {
-	// 	board[connectTwo(aiMoves, playerMoves) - 1]['owner'] = 2;
-	// 	turn = 1;
-	// 	console.log("connectTwo");
-	// 	return;
-	// }
-	if (randomMove()) {
-		//console.log(board[randomMove() - 1]);
-		board[randomMove() - 1]['owner'] = 2;
+	if (typeof connectTwo(aiMoves, playerMoves) == 'number'){
+		board[connectTwo(aiMoves, playerMoves)]['owner'] = 2;
+		turn = 1;
+		console.log("connectTwo");
+		return;
+	}
+	if (typeof randomMove() == "number") {
+		//console.log(board[randomMove()]);
+		board[randomMove()]['owner'] = 2;
 		turn = 1;
 		console.log("random");
 		//console.log(board);
@@ -214,15 +214,15 @@ function refreshMoves() {
 // deploy at the index number not yet there.
 
 
-function immediateEndCheck(arr) { // returns the winning move or false
+function immediateEndCheck(arr) { // returns the winning move(number) or false
     for (var i = 0; i < winConditions.length; i++) {
 		var moves = winConditions[i];
 		for (var n = 0; n < 3; n++) {
 			if (moves.length == 1 && board[moves[0]]['owner'] == 0){
-				return moves[0] + 1;
+				return moves[0];
 			}
 			if (arr.indexOf(winConditions[i][n]) !== -1) {
-				moves.splice(n, 1);
+				//moves.splice(n, 1);
 			}
 		}
 	}
@@ -236,29 +236,32 @@ function immediateEndCheck(arr) { // returns the winning move or false
 // pick a square out of the remaining wincoditions.
 function connectTwo(arr, arrtwo){
 	if(arr.length == 0){
-		return;
+		return false;
 	}
 	
 	var candidateConditions = [];
+	// get the index of potential winconditions
 	loop1:
 	for (var i = 0; i < winConditions.length; i++) {
 		loop2:
 		for (var n = 0; n < 3; n++) {
 			if (arr.indexOf(winConditions[i][n]) !== -1) {
-				candidateConditions.push(winConditions[i]);
+				candidateConditions.push(i);
 				continue loop1;
 			}
 		}
 	}
+	//console.log("canddiates: "+ candidateConditions);
 	if (candidateConditions.length == 0){
 		return false;
 	}
+	// check whether enemy move block any of the potential win conditions.
 	loop3:
-	for (var i = 0; i < winConditions.length; i++) {
+	for (var i = 0; i < candidateConditions.length; i++) {
 		loop4:
 		for (var n = 0; n < 3; n++) {
-			if (arrtwo.indexOf(winConditions[i][n]) !== -1 && candidateConditions.indexOf(winConditions[i] !== -1)){
-				candidateConditions.splice(candidateConditions.indexOf(winConditions[i]),1);
+			if (arrtwo.indexOf(winConditions[candidateConditions[i]][n]) !== -1){
+				candidateConditions.splice(i,1);
 				continue loop3;
 			}
 		}
@@ -266,28 +269,28 @@ function connectTwo(arr, arrtwo){
 	if (candidateConditions.length == 0){
 		return false;
 	}
-	for (var i = 0; i < candidateConditions[0].length; i++) {
-		if (arr.indexOf(candidateConditions[0][i] !== -1)){
-			return candidateConditions[0][i] + 1;
+	for (var i = 0; i < winConditions[candidateConditions[0]].length; i++) {
+		if (arr.indexOf(winConditions[candidateConditions[0]][i] == -1)){
+			//console.log("i have moved: "+ arr);
+			//console.log(winConditions[candidateConditions[0]][i]);
+			return winConditions[candidateConditions[0]][i];
 		}
 	}
+	return false;
 }
 
 function randomMove(){
 	var moves = [0,1,2,3,4,5,6,7,8];
 	var combined = playerMoves.concat(aiMoves);
-	console.log(combinedMoves);
+	//console.log("asdf");
 	moves = shuffleArray(moves);
-	console.log(moves);
 	for (var i = 0; i < moves.length; i++) {
 		if(combined.indexOf(moves[i]) == -1){
-			console.log("randommove: "+ moves[i]);
-			return moves[i] + 1;
+			return moves[i];
 		}	
 	}
 	return false;
 }
-
 function shuffleArray(array) {
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
