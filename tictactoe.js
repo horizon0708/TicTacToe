@@ -167,16 +167,18 @@ function aiMove() {
 		return;
 	}	
 	refreshMoves();
-	// if (typeof immediateEndCheck(aiMoves) == 'number') { // 1.
-	// 	board[immediateEndCheck(aiMoves)]['owner'] = 2;
-	// 	turn = 1;
-	// 	return;
-	// }
-	// if (typeof immediateEndCheck(playerMoves) == 'number') { // 2.
-	// 	board[immediateEndCheck(playerMoves)]['owner'] = 2;
-	// 	turn = 1;
-	// 	return;
-	// }
+	if (immediateEndCheck('ai')) { // 1.
+		board[immediateEndCheck()-1]['owner'] = 2;
+		turn = 1;
+		console.log("I win!");
+		return;
+	}
+	if (immediateEndCheck('player')) { // 2.
+		board[immediateEndCheck('player')- 1]['owner'] = 2;
+		turn = 1;
+		console.log('block!');
+		return;
+	}
 	console.log(connectTwo());
 	if (connectTwo()){
 		board[connectTwo() - 1]['owner'] = 2;
@@ -219,15 +221,23 @@ function refreshMoves() {
 // deploy at the index number not yet there.
 
 
-function immediateEndCheck(arr) { // returns the winning move(number) or false
-    for (var i = 0; i < winConditions.length; i++) {
-		var moves = winConditions[i];
-		for (var n = 0; n < 3; n++) {
-			if (moves.length == 1 && board[moves[0]]['owner'] == 0){
-				return moves[0];
+function immediateEndCheck(str) { // returns the winning move(number) or false
+    endCheck:
+	for (var i = 0; i < winConditions.length; i++) {
+		var counter = 0;
+		for (var n = 0; n < 3; n++){
+			if (board[winConditions[i][n]]['owner']=== (str === 'ai' ? 2 : 1)){
+				counter++;
 			}
-			if (arr.indexOf(winConditions[i][n]) !== -1) {
-				//moves.splice(n, 1);
+			if (board[winConditions[i][n]]['owner']=== (str === 'ai' ? 1 : 2)){
+				continue endCheck;
+			}
+		}
+		if (counter === 2){
+			for (var n = 0; n < 3; n++){
+				if (board[winConditions[i][n]]['owner']=== 0){
+					return winConditions[i][n] + 1;
+				}
 			}
 		}
 	}
