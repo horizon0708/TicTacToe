@@ -24,9 +24,12 @@ function gameStart() {
 }
 
 function gameRestart() {
+	console.log(winConditions);
 	aiMoves = [];
 	playerMoves = [];
 	board = [];
+	combinedMoves = [];
+	turn = 1;
 	isGameOver = false;
 	initialiseBoard();
 	clearBoard();
@@ -175,7 +178,8 @@ function aiMove() {
 	// 	return;
 	// }
 	if (typeof connectTwo(aiMoves, playerMoves) == 'number'){
-		board[connectTwo(aiMoves, playerMoves)]['owner'] = 2;
+		//board[connectTwo(aiMoves, playerMoves)]['owner'] = 2;
+		console.log(connectTwo(aiMoves, playerMoves));
 		turn = 1;
 		console.log("connectTwo");
 		return;
@@ -192,7 +196,7 @@ function aiMove() {
 }
 
 function refreshMoves() {
-			aiMoves = [];
+		aiMoves = [];
 		playerMoves = [];
 		combinedMoves = [];
 	for (var i = 0; i < board.length; i++) {
@@ -243,7 +247,6 @@ function connectTwo(arr, arrtwo){
 	// get the index of potential winconditions
 	loop1:
 	for (var i = 0; i < winConditions.length; i++) {
-		loop2:
 		for (var n = 0; n < 3; n++) {
 			if (arr.indexOf(winConditions[i][n]) !== -1) {
 				candidateConditions.push(i);
@@ -256,36 +259,44 @@ function connectTwo(arr, arrtwo){
 		return false;
 	}
 	// check whether enemy move block any of the potential win conditions.
-	loop3:
-	for (var i = 0; i < candidateConditions.length; i++) {
-		loop4:
+	console.log("players have moved: " + playerMoves);
+
+	for (var i = candidateConditions.length -1; i > -1; i--){
 		for (var n = 0; n < 3; n++) {
 			if (arrtwo.indexOf(winConditions[candidateConditions[i]][n]) !== -1){
 				candidateConditions.splice(i,1);
-				continue loop3;
+				console.log('remaining canddiate conditions are: ' + candidateConditions);
+				continue;
 			}
 		}
 	}
+
+	// of course!, for + splice won't work! make for go in reverse!
+
 	if (candidateConditions.length == 0){
 		return false;
 	}
+	console.log('final candidate conditions are: ' + candidateConditions);
+	console.log('final candidate condition indexs is: '+ candidateConditions[0] + ". containing: " +
+	winConditions[candidateConditions[0]][0], winConditions[candidateConditions[0]][1], winConditions[candidateConditions[0]][2]);
 	for (var i = 0; i < winConditions[candidateConditions[0]].length; i++) {
-		if (arr.indexOf(winConditions[candidateConditions[0]][i] == -1)){
-			//console.log("i have moved: "+ arr);
-			//console.log(winConditions[candidateConditions[0]][i]);
+		if (aiMoves.indexOf(winConditions[candidateConditions[0]][i] == -1)){
+			console.log(aiMoves.indexOf(winConditions[candidateConditions[0]][i]));
+			console.log("i have moved: "+ aiMoves);
+			console.log("moving to: "+winConditions[candidateConditions[0]][i]);
 			return winConditions[candidateConditions[0]][i];
-		}
+		} 
 	}
 	return false;
 }
 
 function randomMove(){
 	var moves = [0,1,2,3,4,5,6,7,8];
-	var combined = playerMoves.concat(aiMoves);
+	//var combined = playerMoves.concat(aiMoves);
 	//console.log("asdf");
 	moves = shuffleArray(moves);
 	for (var i = 0; i < moves.length; i++) {
-		if(combined.indexOf(moves[i]) == -1){
+		if(combinedMoves.indexOf(moves[i]) == -1){
 			return moves[i];
 		}	
 	}
