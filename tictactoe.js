@@ -150,11 +150,6 @@ function clearBoard() {
 // --------- AI ---------
 
 function aiMove() {
-	// 1. if there is an immediate win condition, place there
-	// 2. if there is an immediate lose condition, place there
-	// 3. check for double prong possibility
-	// 4. try to make 2
-	// 5. randomise?
 	if(isGameOver){
 		return;
 	}	
@@ -211,9 +206,16 @@ function immediateEndCheck(str) { // returns the winning move(number) or false
 }
 
 function connectTwo(){
-	if(aiMoves.length == 0){
+	var count = 0;
+	for (var i = 0; i < board.length; i++) {
+		if (board[i]['owner'] === 2){
+			count++;
+			break;
+		}
+	}
+	if (count == 0){
 		return false;
-	}	
+	}
 	var candidateIndex = [];
 	loop1:
 	for (var i = 0; i <  winConditions.length; i++){
@@ -241,8 +243,8 @@ function connectTwo(){
 }
 
 function randomMove(){
-	var moves = [0,1,2,3,4,5,6,7,8];
-	moves = shuffleArray(moves);
+	var moves = [4,0,2,6,8,1,3,5,7];
+	//moves = shuffleArray(moves);
 	for (var i = 0; i < board.length; i++) {
 		if(board[moves[i]]['owner'] === 0){
 			return moves[i];
