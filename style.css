@@ -1,0 +1,70 @@
+table, tr, td {
+  border: 2px solid black;
+}
+
+.square {
+  width: 150px;
+  height: 150px;
+}
+
+
+
+
+
+
+
+.item-4{
+    grid-area: tictac;
+}
+
+.item-1{
+    background-color: red;
+    grid-area: header;
+}
+
+.item-2{
+    background-color: blue;
+    grid-area: footer;
+}
+
+.item-3{
+    background-color: grey;
+    grid-area: body;
+}  
+
+    /* Extra Small Devices, Phones */ 
+@media only screen and (min-width : 480px) {
+    .container{
+    display: grid;
+    grid-auto-rows: minmax(100px, auto);
+    grid-template-columns:  480px ;
+    grid-template-areas: 
+        "header"
+        "body"
+        "tictac"
+        "footer"
+    }
+}
+
+    /* Small Devices, Tablets */
+@media only screen and (min-width : 768px) {
+
+}
+
+    /* Medium Devices, Desktops */
+@media only screen and (min-width : 992px) {
+    .container{
+    display: grid;
+    grid-auto-rows: minmax(100px, 33%);
+    grid-template-columns: auto 450px auto;
+    grid-template-areas: 
+        "header header header"
+        "body tictac ."
+        "footer footer footer"
+}
+}
+
+    /* Large Devices, Wide Screens */
+@media only screen and (min-width : 1200px) {
+
+}
